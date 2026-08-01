@@ -1,0 +1,15 @@
+# Object files
+*.o
+
+# Kernel binary
+*.bin
+
+# Optional map files
+*.map
+
+# Editor files
+*.swp
+*.swo
+
+*.sw?
+
