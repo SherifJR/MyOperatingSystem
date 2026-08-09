@@ -2,7 +2,8 @@
 .set FLAGS, (1<<0 | 1<<1 | 1<<2)
 .set CHECKSUM, -(MAGIC + FLAGS)
 
-.section .multiboot
+.section .multiboot,"a"
+.align 4
     .long MAGIC 
     .long FLAGS
     .long CHECKSUM
