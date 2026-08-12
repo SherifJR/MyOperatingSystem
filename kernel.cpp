@@ -45,23 +45,37 @@ struct multiboot_info{
   };
 } __attribute__((packed));
 
+void render_a_pixel(void *multiboot_structure, int x, int y, int color)
+{
+  multiboot_info *multi_boot = (multiboot_info *) multiboot_structure;
+  uint8_t *fb = (uint8_t *) multi_boot->framebuffer_addr;
+  uint8_t *address =(uint8_t *) fb + y*multi_boot->framebuffer_pitch + x*(multi_boot->framebuffer_bpp/8);
+  *(uint32_t *) address = color;
+}
+
 
 extern "C" void kernel_main(void* multiboot_structure, unsigned int magic)
 {
   multiboot_info* multi_boot = (multiboot_info* ) multiboot_structure;
   if(multi_boot->flags & (1<<12)){ //if bit 12 is set, it is true.
-    uint32_t* fb = (uint32_t*) (uint32_t) multi_boot->framebuffer_addr;
+    //uint32_t* fb = (uint32_t*) (uint32_t) multi_boot->framebuffer_addr;
     uint32_t width = multi_boot->framebuffer_width;
     uint32_t height = multi_boot->framebuffer_height;
 
-    for(uint32_t x=0; x<height; ++x){ //this loop is to determine which pixel to be filled.
-      for(uint32_t y=0; y<width; ++y){  //x: row, y: col.
-        fb[x*width +y] = 0x0000FF;
+    for(uint32_t y=0; y<height; ++y){ //this loop is to determine which pixel to be filled.
+      for(uint32_t x=0; x<width; ++x){  //y: row, x: col.
+       //fb[x*width +y] = 0x0000FF;
+       if(x % 25 == 0 and y % 30 == 0){
+         render_a_pixel(multiboot_structure, x, y, 0xFF0000);
+         render_a_pixel(multiboot_structure, x+1, y+1, 0x00FF00);
+       }
       }
     }
   }
   while(1);
 }
+
+
 
 
 /*
