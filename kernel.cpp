@@ -53,6 +53,40 @@ void render_a_pixel(void *multiboot_structure, int x, int y, int color)
   *(uint32_t *) address = color;
 }
 
+void draw_rectangle(void *multiboot_structure, int color)
+{
+  multiboot_info *multi_boot = (multiboot_info *) multiboot_structure;
+  for(int row=5; row<(int)multi_boot->framebuffer_height-5; row++)
+  {
+    for(int col=5; col<(int)multi_boot->framebuffer_width-5; col++)
+    {
+      render_a_pixel(multiboot_structure, col, row, color);
+    }
+  }
+}
+
+
+//draw line going from left to right using Bresenham algorothm
+void draw_bresenham_line(void *multiboot_structure, int x0, int y0, int x1, int y1, int color){
+  int d_x = x1 - x0;
+  int d_y = y1 - y0;
+  int d = 2*d_y - d_x;
+  int _x = x0;
+  int _y = y0;
+
+  while(_x<=x1){
+    render_a_pixel(multiboot_structure, _x, _y, color);
+    _x += 1;
+
+    if(d<0)
+    {
+      d += 2*d_y;
+    }else{
+      d += 2 * (d_y - d_x);
+      _y += 1;
+    }
+  }
+}
 
 extern "C" void kernel_main(void* multiboot_structure, unsigned int magic)
 {
@@ -66,8 +100,7 @@ extern "C" void kernel_main(void* multiboot_structure, unsigned int magic)
       for(uint32_t x=0; x<width; ++x){  //y: row, x: col.
        //fb[x*width +y] = 0x0000FF;
        if(x % 25 == 0 and y % 30 == 0){
-         render_a_pixel(multiboot_structure, x, y, 0xFF0000);
-         render_a_pixel(multiboot_structure, x+1, y+1, 0x00FF00);
+         draw_bresenham_line(multiboot_structure, x, y, x+15, y+15, 0xFFFFFF);
        }
       }
     }
